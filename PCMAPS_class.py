@@ -198,6 +198,8 @@ class Mapper(object):
         self.nside_in  = config.get_parameter('nside_in')
         self.npix_in   = hp.nside2npix(self.nside_in)
         self.declabs   = config.get_parameter('dect_labels')
+        self.tag       = config.get_parameter('tag')
+        self.gen_flag  = config.get_parameter('map_gen_flag')
 
         self.dects = np.array([])
         for d in self.declabs: 
@@ -207,6 +209,10 @@ class Mapper(object):
         self.Qresp = self.Qresp_vec()
         self.Q     = qp.QPoint(accuracy='low', fast_math=True, mean_aber=True)#, num_threads=1)
 
+        ''' if you don't already have input map file: '''
+        if self.gen_flag ==True:
+            self.Generate_Map_In(lmax = 16)
+        
         ## while we are simulating:
         self.maps_in = self.Map_In()
 
@@ -455,9 +461,9 @@ class Mapper(object):
         return res2[0]+1.j*res2[2], res2[1]+1.j*res2[3]
 
 
-    def Map_In(self):
+    def Generate_Map_In(self, lmax = 8):
         ''' Synfast random map '''
-        lmax = 8
+
         const = 1.
         Cl = []
         for i in range(1,lmax):
@@ -471,16 +477,24 @@ class Mapper(object):
         
         hp_in = hp_in*np.exp(1.j*ph1)
         hc_in = hc_in*np.exp(1.j*ph2)
-        np.savez('hp_hc_in_ns%s_ieqo.npz' % self.nside_in, hp_in = hp_in, hc_in = hc_in)
-        exit()
-        file = np.load('hp_hc_in_ns%s_ieqo.npz' % self.nside_in)
+        np.savez('hp_hc_in_ns%s_%s.npz' % (self.nside_in, self.tag), hp_in = hp_in, hc_in = hc_in)
+
+        return 0
+
+
+    def Map_In(self):
+        try: 
+            file = np.load('hp_hc_in_ns%s_%s.npz' % (self.nside_in, self.tag))
+            hp_in = file['hp_in']
+            hc_in = file['hc_in']
+            return hp_in, hc_in
         
-        hp_in = file['hp_in']
-        hc_in = file['hc_in']
+        except FileNotFoundError:
+            file = np.load('hp_hc_in_ns%s_%s.npz' % (16, self.tag))
+            hp_in = file['hp_in']
+            hc_in = file['hc_in']
+            return hp.ud_grade(hp_in, nside_out = self.nside_in), hp.ud_grade(hc_in, nside_out = self.nside_in)
         
-        #print('input maps loaded!')
-        
-        return hp_in, hc_in
                
                
     def Faux_Noise(self,freqs,Nsegs):
