@@ -3,7 +3,6 @@ import scipy as sc
 import healpy as hp
 import matplotlib.pyplot as plt
 import PCMAPS_class as PCM
-import numpy as np
 
 from config import Configuration
 from numpy.linalg import norm
@@ -33,9 +32,10 @@ nside_out = 4
 npix_in   = hp.nside2npix(nside_in)
 npix_out  = hp.nside2npix(nside_out)
 
+
 out_tag      = sys.argv[1]
 namefile_out = 'map_' + out_tag + 'HL_ns_' + str(nside_out)
-map_gen_flag = False
+map_gen_flag = True
 
 CONFIG_PARAMS = {'nside_in': nside_in,
                             'nside_out': nside_out,

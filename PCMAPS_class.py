@@ -5,7 +5,6 @@ import quat_rotation as qr
 import matplotlib.pyplot as plt
 from numpy import cos,sin
 import OverlapFunctsSrc as ofs
-
 REARTH = 6378137.0
 CLIGHT = 3.e8
 
@@ -471,12 +470,20 @@ class Mapper(object):
         Cl = np.array(Cl)
         hp_in = hp.sphtfunc.synfast(Cl/2.,self.nside_in, verbose = False)
         hc_in = hp.sphtfunc.synfast(Cl/2.,self.nside_in, verbose = False)
-        
-        ph1 = np.pi*2*np.random.rand(len(hp_in))
-        ph2 = np.pi*2*np.random.rand(len(hp_in))
+
+        alm = np.zeros(hp.Alm.getidx(lmax,lmax,lmax)+1,dtype=np.complex)
+        idx = hp.Alm.getidx(lmax,1,0)
+        alm[idx] = (1.+ 0.j)
+        hp_in = hp.alm2map(alm,nside = self.nside_in,verbose = False)
+        hp_in += -np.min(hp_in)
+        hc_in = np.copy(hp_in)
+
+        ph1 = 0.    #np.pi*2*np.random.rand(len(hp_in))
+        ph2 = 0.    #np.pi*2*np.random.rand(len(hp_in))
         
         hp_in = hp_in*np.exp(1.j*ph1)
         hc_in = hc_in*np.exp(1.j*ph2)
+
         np.savez('hp_hc_in_ns%s_%s.npz' % (self.nside_in, self.tag), hp_in = hp_in, hc_in = hc_in)
 
         return 0
