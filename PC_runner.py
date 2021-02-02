@@ -31,17 +31,18 @@ nside_in  = 16
 nside_out = 4
 npix_in   = hp.nside2npix(nside_in)
 npix_out  = hp.nside2npix(nside_out)
-
+freqs     = np.linspace(80,300,200)
 
 out_tag      = sys.argv[1]
 namefile_out = 'map_' + out_tag + 'HL_ns_' + str(nside_out)
-map_gen_flag = True
+map_gen_flag = False
 
 CONFIG_PARAMS = {'nside_in': nside_in,
                             'nside_out': nside_out,
                             'dect_labels': ['H1','L1'], # 'V1', 'K'],
                             'tag': out_tag,
-                            'map_gen_flag': map_gen_flag}
+                            'map_gen_flag': map_gen_flag,
+                            'N_freqs': len(freqs)}
                             
                             
 ''' Time array 1 day sampled every minute '''
@@ -52,7 +53,6 @@ CONFIG = Configuration.type(CONFIG_PARAMS)
 
 import healpy as hp
 
-freqs = np.linspace(80,300,200)
 
 mapmake = PCM.Mapper(CONFIG)
 

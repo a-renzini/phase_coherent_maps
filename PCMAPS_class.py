@@ -14,7 +14,7 @@ def unit_vec(theta, phi):
 
 class Detector(object):
     
-    def __init__(self,nside, dect_name):
+    def __init__(self, nside, dect_name):
         
         self._nside = nside
         lmax = int(nside/2)
@@ -132,7 +132,7 @@ class Detector(object):
         return 0.5*(np.outer(self._u,self._u)-np.outer(self._v,self._v))   
 
 
-    def Fplus(self,theta,phi):
+    def Fplus(self, theta, phi):
 
         d_t = self.d_tens()
         res = 0
@@ -147,7 +147,7 @@ class Detector(object):
         return res
     
 
-    def Fcross(self,theta,phi): 
+    def Fcross(self, theta, phi): 
         
         d_t = self.d_tens()
         res = 0
@@ -199,6 +199,7 @@ class Mapper(object):
         self.declabs   = config.get_parameter('dect_labels')
         self.tag       = config.get_parameter('tag')
         self.gen_flag  = config.get_parameter('map_gen_flag')
+        self.N_freqs   = config.get_parameter('N_freqs')
 
         self.dects = np.array([])
         for d in self.declabs: 
@@ -210,12 +211,12 @@ class Mapper(object):
 
         ''' if you don't already have input map file: '''
         if self.gen_flag ==True:
-            self.Generate_Map_In(lmax = 16)
-        
+            self.Generate_Map_In(lmax = 3)
+            exit()
         ## while we are simulating:
         self.maps_in = self.Map_In()
-
             
+
     def Fshape(self, f, alpha = 3, f0 = 25.): #0.66666667
         return (f/f0)**((alpha-3.)/2.)
     
@@ -318,11 +319,6 @@ class Mapper(object):
             Qr_vec[i+self.ndet] = np.imag(res2)
 
         Qresp = Qr_vec
-        #Avec = np.split(Qr_vec[0]+1.j*Qr_vec[3],2)
-        #hp.mollview(Avec[0]*np.conj(Avec[0])+Avec[1]*np.conj(Avec[1]))
-        #plt.show()
-        #exit()
-        #Qexp  = np.einsum('Xpf,Xp->Xpf', self.exp_factor(freqs, tstamp, ud_grade), Qr_vec)
         return Qresp
 
 
@@ -363,13 +359,13 @@ class Mapper(object):
         delf = freqs[1] - freqs[0]
 
         hp_in, hc_in = self.maps_in
-        h_maps       = np.ravel([hp_in, hc_in])
-        flat_h       = len(freqs)*[h_maps] 
+        h_maps       = np.hstack([hp_in, hc_in])
+        #flat_h       = len(freqs)*[h_maps] 
         # nonflat_h = []
         # for idx in range(len(freqs)):
         #     nonflat_h.append(Fdep[idx]*h)
         Qresp = self.Resp_Vec(tstamp, freqs)
-        res2  = np.einsum('Dfp,fp-> Df', Qresp, flat_h) #sums over pix
+        res2  = np.einsum('Dfp,fp-> Df', Qresp, h_maps) #sums over pix
         res   = delf * 4. * np.pi / self.npix_in * res2
         return res
         
@@ -471,21 +467,21 @@ class Mapper(object):
         hp_in = hp.sphtfunc.synfast(Cl/2.,self.nside_in, verbose = False)
         hc_in = hp.sphtfunc.synfast(Cl/2.,self.nside_in, verbose = False)
 
-        alm = np.zeros(hp.Alm.getidx(lmax,lmax,lmax)+1,dtype=np.complex)
-        idx = hp.Alm.getidx(lmax,1,0)
-        alm[idx] = (1.+ 0.j)
-        hp_in = hp.alm2map(alm,nside = self.nside_in,verbose = False)
-        hp_in += -np.min(hp_in)
-        hc_in = np.copy(hp_in)
+        #alm = np.zeros(hp.Alm.getidx(lmax,lmax,lmax)+1,dtype=np.complex)
+        #idx = hp.Alm.getidx(lmax,1,0)
+        #alm[idx] = (1.+ 0.j)
+        #hp_in = hp.alm2map(alm,nside = self.nside_in,verbose = False)
+        #hp_in += -np.min(hp_in)
+        #hc_in = np.copy(hp_in)
 
-        ph1 = 0.    #np.pi*2*np.random.rand(len(hp_in))
-        ph2 = 0.    #np.pi*2*np.random.rand(len(hp_in))
-        
+        ph1 = np.pi*2*np.random.rand(self.N_freqs, len(hp_in))
+        ph2 = np.pi*2*np.random.rand(self.N_freqs, len(hp_in))        
+
         hp_in = hp_in*np.exp(1.j*ph1)
         hc_in = hc_in*np.exp(1.j*ph2)
 
         np.savez('hp_hc_in_ns%s_%s.npz' % (self.nside_in, self.tag), hp_in = hp_in, hc_in = hc_in)
-
+        
         return 0
 
 
