@@ -35,7 +35,9 @@ freqs     = np.linspace(80,300,200)
 
 out_tag      = sys.argv[1]
 input_path   = sys.argv[2]
-namefile_out = 'map_' + out_tag + 'HL_ns_' + str(nside_out)
+output_path  = sys.argv[3]
+
+namefile_out = 'map_' + out_tag + '_HL_ns_' + str(nside_out) + '.npz'
 map_gen_flag = False
 
 CONFIG_PARAMS = {'nside_in': nside_in,
@@ -117,7 +119,7 @@ if my_id == 0:
     print('We have output map!', flush = True)
 
 
-    np.savez(namefile_out,  h_plus = h_plus, h_cross = h_cross, Dmap = Dmap, Beam = Beam)
+    np.savez(output_path + namefile_out,  h_plus = h_plus, h_cross = h_cross, Dmap = Dmap, Beam = Beam)
     print(namefile_out , 'saved', flush = True)
 
     
