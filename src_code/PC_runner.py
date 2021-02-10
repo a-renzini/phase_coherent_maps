@@ -34,7 +34,7 @@ npix_out  = hp.nside2npix(nside_out)
 freqs     = np.linspace(80,300,200)
 
 out_tag      = sys.argv[1]
-input_path   = sys.argv[2]
+input_path   = sys.argv[2] 
 output_path  = sys.argv[3]
 
 namefile_out = 'map_' + out_tag + '_HL_ns_' + str(nside_out) + '.npz'
@@ -119,7 +119,7 @@ if my_id == 0:
     print('We have output map!', flush = True)
 
 
-    np.savez(output_path + namefile_out,  h_plus = h_plus, h_cross = h_cross, Dmap = Dmap, Beam = Beam)
+    np.savez(output_path + '/' + namefile_out,  h_plus = h_plus, h_cross = h_cross, Dmap = Dmap, Beam = Beam)
     print(namefile_out , 'saved', flush = True)
 
     
