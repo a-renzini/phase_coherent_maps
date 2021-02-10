@@ -360,8 +360,9 @@ class Mapper(object):
         delf = freqs[1] - freqs[0]
 
         hp_in, hc_in = self.maps_in
-        h_maps       = np.hstack([hp_in, hc_in])
-        #flat_h       = len(freqs)*[h_maps] 
+        h_maps       = np.ravel([hp_in, hc_in])
+        #h_maps       = np.hstack([hp_in, hc_in])
+        h_maps       = len(freqs)*[h_maps] ## freq maps remove!
         # nonflat_h = []
         # for idx in range(len(freqs)):
         #     nonflat_h.append(Fdep[idx]*h)
