@@ -27,21 +27,23 @@ else:
     my_id = 0
 
 '''Set of parameters in dictionnary format'''
-nside_in  = 16
+nside_in  = 8
 nside_out = 4
 npix_in   = hp.nside2npix(nside_in)
 npix_out  = hp.nside2npix(nside_out)
 
 
 out_tag      = sys.argv[1]
+input_path   = sys.argv[2]
 namefile_out = 'map_' + out_tag + 'HL_ns_' + str(nside_out)
-map_gen_flag = True
+map_gen_flag = False
 
 CONFIG_PARAMS = {'nside_in': nside_in,
                             'nside_out': nside_out,
                             'dect_labels': ['H1','L1'], # 'V1', 'K'],
                             'tag': out_tag,
-                            'map_gen_flag': map_gen_flag}
+                            'map_gen_flag': map_gen_flag,
+			    'input_dir': input_path}
                             
                             
 ''' Time array 1 day sampled every minute '''

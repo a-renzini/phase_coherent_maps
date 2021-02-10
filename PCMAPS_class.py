@@ -199,7 +199,8 @@ class Mapper(object):
         self.declabs   = config.get_parameter('dect_labels')
         self.tag       = config.get_parameter('tag')
         self.gen_flag  = config.get_parameter('map_gen_flag')
-
+        self.input_dir = config.get_parameter('input_dir')
+	
         self.dects = np.array([])
         for d in self.declabs: 
             self.dects = np.append(self.dects,Detector(self.nside_in,d))
@@ -491,13 +492,13 @@ class Mapper(object):
 
     def Map_In(self):
         try: 
-            file = np.load('hp_hc_in_ns%s_%s.npz' % (self.nside_in, self.tag))
+            file = np.load('%s/hp_hc_in_ns%s_%s.npz' % (self.input_dir, self.nside_in, self.tag))
             hp_in = file['hp_in']
             hc_in = file['hc_in']
-            return hp_in, hc_in
+            return hp.ud_grade(hp_in, nside_out = self.nside_in), hp.ud_grade(hc_in, nside_out = self.nside_in)
         
         except FileNotFoundError:
-            file = np.load('hp_hc_in_ns%s_%s.npz' % (16, self.tag))
+            file = np.load('%s/hp_hc_in_ns%s_%s.npz' % (self.input_dir, 16, self.tag))
             hp_in = file['hp_in']
             hc_in = file['hc_in']
             return hp.ud_grade(hp_in, nside_out = self.nside_in), hp.ud_grade(hc_in, nside_out = self.nside_in)
