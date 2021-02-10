@@ -27,8 +27,8 @@ else:
     my_id = 0
 
 '''Set of parameters in dictionnary format'''
-nside_in  = 8
-nside_out = 4
+nside_in  = 16
+nside_out = 8
 npix_in   = hp.nside2npix(nside_in)
 npix_out  = hp.nside2npix(nside_out)
 freqs     = np.linspace(80,300,200)
