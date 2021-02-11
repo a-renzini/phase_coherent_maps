@@ -212,7 +212,7 @@ class Mapper(object):
 
         ''' if you don't already have input map file: '''
         if self.gen_flag ==True:
-            self.Generate_Map_In(lmax = 3)
+            self.Generate_Map_In()
             exit()
         ## while we are simulating:
         self.maps_in = self.Map_In()
@@ -360,12 +360,17 @@ class Mapper(object):
         delf = freqs[1] - freqs[0]
 
         hp_in, hc_in = self.maps_in
-        h_maps       = np.ravel([hp_in, hc_in])
-        #h_maps       = np.hstack([hp_in, hc_in])
-        h_maps       = len(freqs)*[h_maps] ## freq maps remove!
+        h_maps       = np.hstack([hp_in, hc_in])
+
+        ## no freq phase use:
+        #h_maps       = np.ravel([hp_in, hc_in])
+        #h_maps       = len(freqs)*[h_maps] 
+
+        # add spectral shape use:
         # nonflat_h = []
         # for idx in range(len(freqs)):
-        #     nonflat_h.append(Fdep[idx]*h)
+        #     nonflat_h.append(Fdep[idx]*h_maps)
+
         Qresp = self.Resp_Vec(tstamp, freqs)
         res2  = np.einsum('Dfp,fp-> Df', Qresp, h_maps) #sums over pix
         res   = delf * 4. * np.pi / self.npix_in * res2
@@ -466,8 +471,14 @@ class Mapper(object):
         for i in range(1,lmax):
             Cl.append(const/(i)**2)
         Cl = np.array(Cl)
-        hp_in = hp.sphtfunc.synfast(Cl/2.,self.nside_in, verbose = False)
-        hc_in = hp.sphtfunc.synfast(Cl/2.,self.nside_in, verbose = False)
+        
+        
+        file = np.load('%s/hp_hc_in_ns16_GB_smooth.npz' % (self.input_dir))
+        hp_in = file['hp_in']
+        hc_in = file['hc_in']
+
+        #hp_in = hp.sphtfunc.synfast(Cl/2.,self.nside_in, verbose = False)
+        #hc_in = hp.sphtfunc.synfast(Cl/2.,self.nside_in, verbose = False)
 
         #alm = np.zeros(hp.Alm.getidx(lmax,lmax,lmax)+1,dtype=np.complex)
         #idx = hp.Alm.getidx(lmax,1,0)
