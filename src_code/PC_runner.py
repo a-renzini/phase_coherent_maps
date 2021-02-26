@@ -27,33 +27,39 @@ else:
     my_id = 0
 
 '''Set of parameters in dictionnary format'''
-nside_in  = 16
-nside_out = 8
+#import configparser
+#Config = configparser.ConfigParser()
+import importlib
+inlib = importlib.import_module(sys.argv[1])
+
+#Config.read(ini_file)
+#CONFIG_PARAMS = Config["DEFAULT"]["CONFIG_PARAMS"]
+'''Instance of a configuration class'''
+CONFIG_PARAMS = inlib.CONFIG_PARAMS
+CONFIG = Configuration.type(CONFIG_PARAMS)
+
+''' Freqs details '''
+freq_min = CONFIG_PARAMS['freq_min']
+freq_max = CONFIG_PARAMS['freq_max']
+N_freqs  = int(CONFIG_PARAMS['N_freqs'])
+freqs    = np.linspace(freq_min, freq_max, N_freqs)  
+
+''' Pix details '''
+nside_in  = int(CONFIG_PARAMS['nside_in'])
+nside_out = int(CONFIG_PARAMS['nside_out'])
 npix_in   = hp.nside2npix(nside_in)
 npix_out  = hp.nside2npix(nside_out)
-freqs     = np.linspace(80,300,200)
 
-out_tag      = sys.argv[1]
-input_path   = sys.argv[2] 
-output_path  = sys.argv[3]
+''' File details '''
+out_tag = CONFIG_PARAMS['tag'] 
+input_dir = CONFIG_PARAMS['input_dir'] 
+output_path = CONFIG_PARAMS['output_path']
 
 namefile_out = 'map_' + out_tag + '_HL_ns_' + str(nside_out) + '.npz'
-map_gen_flag = False
 
-CONFIG_PARAMS = {'nside_in': nside_in,
-                            'nside_out': nside_out,
-                            'dect_labels': ['H1','L1'], # 'V1', 'K'],
-                            'tag': out_tag,
-                            'map_gen_flag': map_gen_flag,
-			    'input_dir': input_path,
-                            'N_freqs': len(freqs)}
-                            
-                            
 ''' Time array 1 day sampled every minute '''
 TIME = np.arange(0, 24*3600, 60) #172800,
 
-'''Instance of a configuration class'''
-CONFIG = Configuration.type(CONFIG_PARAMS)
 
 import healpy as hp
 

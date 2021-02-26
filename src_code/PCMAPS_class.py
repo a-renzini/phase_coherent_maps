@@ -360,11 +360,11 @@ class Mapper(object):
         delf = freqs[1] - freqs[0]
 
         hp_in, hc_in = self.maps_in
-        h_maps       = np.hstack([hp_in, hc_in])
+        #h_maps       = np.hstack([hp_in, hc_in])
 
         ## no freq phase use:
-        #h_maps       = np.ravel([hp_in, hc_in])
-        #h_maps       = len(freqs)*[h_maps] 
+        h_maps       = np.ravel([hp_in, hc_in])
+        h_maps       = len(freqs)*[h_maps] 
 
         # add spectral shape use:
         # nonflat_h = []
